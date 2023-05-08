@@ -8,7 +8,7 @@ The Transit format has been introduced by [Cognitect](https://www.cognitect.com/
 
 ## Runing tests.
 
-The library is able to process all the official [test-suite](https://github.com/cognitect/transit-format/blob/master/examples/0.8/simple/README.md). It has been developped and tested with [SBCL](https://www.sbcl.org/) but should work on other CL implementations.  
+The library is able to process all the tests of the official [test-suite](https://github.com/cognitect/transit-format/blob/master/examples/0.8/simple/README.md). It has been developped and tested with [SBCL](https://www.sbcl.org/) but should work on other CL implementations.  
 
 Prerequesites:
 
@@ -80,21 +80,21 @@ Running test suite TEST-EXAMPLAR
 |symbol      |symbol       |symbol      |
 |big integer |integer      |integer      |
 |big decimal |long-float   |long-float   |
-|time        |lt:timestamp    |lt:timestamp or clt:point-in-time|
+|time        |lt:timestamp    |lt:timestamp or clt:tr-timestamp|
 |uri         |quri:uri        |quri:uri            |
 |uuid        |uuid:uuid       |uuid:uuid           |
 |char        |character    |character           |
 |array       |vector       |vector              |
 |list        |list         |list            |
-|set         |fset:set or clt:set         |clt:set          |
+|set         |fset:set or clt:tr-set         |clt:tr-set          |
 |map         |hash-table   |hash-table       |
-|link        |clt:link        |clt:link|
+|link        |clt:tr-link        |clt:tr-link|
 |ratio       |ratio        |ratio               |
 
 
 ## Contributing
 
-Happy to take contributions, and any kind of improvments!
+Happy to take contributions, and any kind of improvments (performance, coding style ...)
 
 ## Copyright and License
 
