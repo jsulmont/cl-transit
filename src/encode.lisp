@@ -52,7 +52,7 @@
           (setf (gethash "prompt" rc) (slot-value data 'prompt)))
         (when (slot-boundp data 'render)
           (setf (gethash "render" rc) (slot-value data 'render)))
-        (cons "~#link" rc))
+        (list "~#link" rc))
       (let ((rc '("^ ")))
         (with-slots (href rel) data
           (setf rc (nconc rc (list "href" (encode-uri href))))
@@ -216,3 +216,8 @@
 (defun encode-mp (data)
   (let ((*encode-target* 'MSGPACK))
     (encode* data)))
+
+
+(setf v (make-instance
+            'tr-link :href (quri:uri "ftp://prep.ai.mit.edu")
+            :rel "a string" :render "link"))

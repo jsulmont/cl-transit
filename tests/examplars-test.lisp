@@ -219,4 +219,19 @@
     (is (tr-equalp r2 v))
     (is (tr-equalp r3 v))
     (is (tr-equalp v (decode-mp (encode-mp v))))
+    (is (tr-equalp v (decode-json (encode-json v))))
+    ))
+
+(test transit-link
+  (let ((v (make-instance
+            'tr-link :href (quri:uri "ftp://prep.ai.mit.edu")
+            :rel "a string" :render "link")))
+    (is (tr-equalp v (decode-mp (encode-mp v))))
     (is (tr-equalp v (decode-json (encode-json v))))))
+
+
+(setf v (make-instance
+            'tr-link :href (quri:uri "ftp://prep.ai.mit.edu")
+            :rel "a string" :render "link"))
+
+(decode-json (encode-json v))
