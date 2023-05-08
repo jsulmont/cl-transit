@@ -28,6 +28,7 @@ then
 * run `make test`
 
 ```
+$  make test
 sbcl --non-interactive \
 		--load run-tests.lisp
 This is SBCL 2.3.4, an implementation of ANSI Common Lisp.
@@ -41,8 +42,7 @@ To load "cl-transit-tests":
   Load 1 ASDF system:
     cl-transit-tests
 ; Loading "cl-transit-tests"
-..................................................
-[package cl-transit-tests]..
+...............................
 
 Running test suite TEST-EXAMPLAR
  Running test JSON<->MP .................................................................
@@ -59,8 +59,9 @@ Running test suite TEST-EXAMPLAR
  Running test SET-NESTED .....
  Running test SET-MIXED .....
  Running test MAPS-UNROCOGNIZED-KEYS .....
- Did 404 checks.
-    Pass: 404 (100%)
+ Running test TRANSIT-LINK ..
+ Did 406 checks.
+    Pass: 406 (100%)
     Skip: 0 ( 0%)
     Fail: 0 ( 0%)
 ```

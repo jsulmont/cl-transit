@@ -5,8 +5,8 @@
 
 (defmethod tr-equalp ((l1 tr-link) (l2 tr-link))
   "we only consider the two mandatory slots"
-  (with-slots ((href1 href) (rel1 rel)) l1
-    (with-slots ((href2 href) (rel2 rel)) l2
+  (with-slots ((href1 clt::href) (rel1 clt::rel)) l1
+    (with-slots ((href2 clt::href) (rel2 clt::rel)) l2
       (and (equalp href1 href2) (equalp rel1 rel2)))))
 
 (defmethod tr-equalp ((p1 tr-timestamp) (p2 tr-timestamp))
@@ -26,10 +26,10 @@
         (string= str1 str2)))))
 
 (defmethod tr-equalp ((s1 tr-set) (s2 tr-set))
-  (unless (slot-boundp s1 'cl-transit::rep)
-    (not (slot-boundp s2 'cl-transit::rep)))
-  (with-slots ((rep1 cl-transit::rep)) s1
-    (with-slots ((rep2 cl-transit::rep)) s2
+  (unless (slot-boundp s1 'clt::rep)
+    (not (slot-boundp s2 'clt::rep)))
+  (with-slots ((rep1 clt::rep)) s1
+    (with-slots ((rep2 clt::rep)) s2
       (tr-equalp rep1 rep2))))
 
 (defmethod tr-equalp ((s1 symbol) (s2 symbol))
@@ -41,25 +41,10 @@
    (alexandria:hash-table-keys ht2)))
 
 (defmethod tr-equalp ((tv1 tagged-value) (tv2 tagged-value))
-  (with-slots ((tag1 cl-transit::tag) (rep1 cl-transit::rep)) tv1
-    (with-slots ((tag2 cl-transit::tag) (rep2 cl-transit::rep)) tv2
+  (with-slots ((tag1 clt::tag) (rep1 clt::rep)) tv1
+    (with-slots ((tag2 clt::tag) (rep2 clt::rep)) tv2
       (and (string= tag1 tag2)
            (equalp rep1 rep2)))))
-
-;; (defmethod tr-equalp ((tv1 tagged-value) (tv2 tagged-value))
-;;   (with-slots ((tag1 cl-transit::tag) (rep1 cl-transit::rep)) tv1
-;;     (with-slots ((tag2 cl-transit::tag) (rep2 cl-transit::rep)) tv2
-;;       (let ((rc  (and (string= tag1 tag2) (equalp rep1 rep2)))
-;;             ( r1 (loop for c across rep1 collect c))
-;;             ( r2 (loop for c across rep2 collect c))
-;;             )
-;;         (format t " tr-equalp t1:~a t2:~a t1=t2:~a r1:~a r2:~a r1=r2:~a ~a ~%"
-;;                 tag1 tag2 (string= tag1 tag2)
-;;                 r1 r2
-;;                           (equalp rep1 rep2)
-;;                 rc)
-;;         rc
-;;         ))))
 
 (defmethod tr-equalp (x y)
   (equalp x y))
