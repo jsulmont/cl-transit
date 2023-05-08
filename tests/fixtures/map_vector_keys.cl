@@ -1,0 +1,4 @@
+(:PCODE 1
+ (:HASH-TABLE 1 7 1.5 1.0 EQUALP NIL
+  ((:LIST 2 1 1) (:SIMPLE-STRING 3 "one") (:LIST 4 2 2)
+   (:SIMPLE-STRING 5 "two"))))
