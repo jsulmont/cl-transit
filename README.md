@@ -10,11 +10,11 @@ The Transit format has been introduced by [Cognitect](https://www.cognitect.com/
 
 The library is able to process all the tests of the official [test-suite](https://github.com/cognitect/transit-format/blob/master/examples/0.8/simple/README.md). It has been developped and tested with [SBCL](https://www.sbcl.org/) but should work on other CL implementations.  
 
-Prerequesites:
+Prerequisites:
 
 * install SBCL (`homebrew`, `apt-get` ...)
 * install [quicklisp](https://www.quicklisp.org/beta/)
-* untill [this commit](https://github.com/Zulu-Inuoe/jzon/commit/d6428d6602752d44d5b08e9c0a51d31f92aee2ab)  has made it to quicklisp (monthly), you need manually clone JZON to your local quicklisp directory e.g.,
+* until [this commit](https://github.com/Zulu-Inuoe/jzon/commit/d6428d6602752d44d5b08e9c0a51d31f92aee2ab)  has made it to quicklisp (monthly), you need manually clone JZON to your local quicklisp directory e.g.,
 
 ```shell
 $ mkdir -p ~/quicklisp/local-projects

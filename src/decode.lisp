@@ -20,6 +20,7 @@
        (int->octets (cadr rep)))))))
 
 (defun make-special-number (s)
+  (declare (string s))
   (cond
     ((string= s "NaN") 'NAN)
     ((string= s "INF") 'INF)
@@ -48,6 +49,12 @@
 (defun make-tr-set (rep)
   (make-instance 'tr-set :rep (if (eql rep 'NULL) '() rep)))
 
+(defun try-make-ratio (rep)
+  (declare (list rep))
+  (or #+sbcl (sb-kernel:build-ratio (car rep) (cadr rep))
+      #-sbcl (make-instance 'tagged-value :tag "ratio" :rep rep)))
+
+
 #|
 local-time seems bogus: the doc says timestamps are based on 2000-01-01:00:00:00Z
 (local-time:make-timestamp :nsec 0) returns "2000-03-01T00:00:00.000000Z"
@@ -74,6 +81,7 @@ We return a `tr-timestamp' carrying the number of millisecs since epoch
         "list" #'identity
         "set" #'make-tr-set
         "cmap" (lambda (x) (alex:plist-hash-table x :test 'equalp))
+        "ratio" #'try-make-ratio
         "'" #'identity))
 
 (defun default-decoder (tag rep)
@@ -81,6 +89,7 @@ We return a `tr-timestamp' carrying the number of millisecs since epoch
   (make-instance 'tagged-value :tag tag :rep rep))
 
 (defun parse-string (s)
+  ;(declare ((simple-array character(*)) s))
   (declare (string s))
   (if (and (> (length s) 0)
            (string= (subseq s 0 1) *ESC*))
@@ -102,7 +111,7 @@ We return a `tr-timestamp' carrying the number of millisecs since epoch
 (defun decode-tag (tag-str rep)
   (declare (string tag-str))
   (let ((decoder (gethash tag-str *decoders*)))
-    (if decoder
+    (if (functionp  decoder)
         (funcall decoder rep)
         (make-instance 'tagged-value :tag tag-str :rep rep))))
 
@@ -110,7 +119,7 @@ We return a `tr-timestamp' carrying the number of millisecs since epoch
   (declare (cons data))
   (if (equal *MAP-AS-CHAR* (car data))
       (let ((hash (make-hash-table :test #'equalp
-                                   :size (/ (length (cdr data)) 2))))
+                                   :size (/ (list-length (cdr data)) 2))))
         (dolist (pair  (serapeum:batches (cdr data) 2)) ;TODO rid serapeum
           (setf (gethash (decode (car pair) cache t) hash)
                 (decode (cadr pair) cache nil)))
