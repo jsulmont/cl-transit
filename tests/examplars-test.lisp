@@ -187,8 +187,7 @@
                        (make-instance
                         'tr-set
                         :rep (list 'NULL 0 2.0d0 "~eight" 1 t "five" nil
-                                   '|seven| :|six|))
-                       ))))
+                                   '|seven| :|six|))))))
     (is (tr-equalp r1 v))
     (is (tr-equalp r2 v))
     (is (tr-equalp r3 v))
@@ -219,8 +218,7 @@
     (is (tr-equalp r2 v))
     (is (tr-equalp r3 v))
     (is (tr-equalp v (decode-mp (encode-mp v))))
-    (is (tr-equalp v (decode-json (encode-json v))))
-    ))
+    (is (tr-equalp v (decode-json (encode-json v))))))
 
 (test transit-link
   (let ((v (make-instance
@@ -229,9 +227,9 @@
     (is (tr-equalp v (decode-mp (encode-mp v))))
     (is (tr-equalp v (decode-json (encode-json v))))))
 
-
-(setf v (make-instance
-            'tr-link :href (quri:uri "ftp://prep.ai.mit.edu")
-            :rel "a string" :render "link"))
-
-(decode-json (encode-json v))
+#+sbcl
+(test ratio
+  (is (= (decode-mp (encode-mp #xFADED/FACADE)) #xFADED/FACADE))
+  (is (= (decode-json (encode-json #xFADED/FACADE)) #xFADED/FACADE))
+  (is (= (decode-mp (encode-mp 22/33)) 2/3))
+  (is (= (decode-json (encode-json 22/33)) 2/3)))

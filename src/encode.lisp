@@ -127,9 +127,7 @@
   (declare (ignore data cache))
   (if (eq *encode-target* 'msgpack)
       nil
-      (if map-key?
-          "~_"
-          'NULL)))
+      (if map-key? "~_" 'NULL)))
 
 (defun encode-tr-set (data cache map-key?)
   (declare (tr-set data))
@@ -175,6 +173,13 @@
       :false
       nil))
 
+(declaim (inline encode-ratio))
+(defun encode-ratio (data)
+  (declare (type ratio data))
+  (list "~#ratio"
+           (list (encode (numerator data))
+                 (encode (denominator data)))))
+
 (defun encode (data &optional (cache nil) (map-key? nil))
   (when (null cache)
     (setf cache (make-instance 'write-cache)))
@@ -198,8 +203,7 @@
     ((tr-timestampp data) (encode-tr-timestamp data))
     ((typep data 'uuid:uuid) (encode-uuid data))
     ((tagged-valuep data) (encode-tagged-value data cache map-key?))
-    ((typep data 'ratio)
-     (cons "~#ratio" (cons (numerator data) (denominator data))))
+    ((typep data 'ratio) (encode-ratio data))
     (t data)))
 
 (defun encode* (data)
@@ -216,8 +220,3 @@
 (defun encode-mp (data)
   (let ((*encode-target* 'MSGPACK))
     (encode* data)))
-
-
-(setf v (make-instance
-            'tr-link :href (quri:uri "ftp://prep.ai.mit.edu")
-            :rel "a string" :render "link"))
