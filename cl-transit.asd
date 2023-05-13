@@ -8,7 +8,8 @@
   :homepage ""
   :bug-tracker ""
   :source-control (:git "https://github.com/jsulmont/cl-transit")
-  :depends-on ("alexandria" "serapeum" "com.inuoe.jzon"
+  :depends-on ("alexandria"
+               "serapeum" "com.inuoe.jzon"
                "cl-messagepack" "local-time"
                "quri" "bit-smasher" "uuid" ; "arrow-macros"
                "parse-float" "flexi-streams")
