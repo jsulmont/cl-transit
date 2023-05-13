@@ -183,7 +183,7 @@
 (declaim (inline pair-p))
 (defun pair-p (data)
   (and (consp data)
-       (not (consp (cdr data)))))
+       (not (listp (cdr data)))))
 
 (defun encode (data &optional (cache nil) (map-key? nil))
   (when (null cache)
