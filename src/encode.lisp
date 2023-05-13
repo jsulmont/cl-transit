@@ -180,6 +180,11 @@
            (list (encode (numerator data))
                  (encode (denominator data)))))
 
+(declaim (inline pair-p))
+(defun pair-p (data)
+  (and (consp data)
+       (not (consp (cdr data)))))
+
 (defun encode (data &optional (cache nil) (map-key? nil))
   (when (null cache)
     (setf cache (make-instance 'write-cache)))
@@ -192,6 +197,7 @@
     ((eql T data) T)
     ((vectorp data) (encode-array data cache map-key?))
     ((hash-table-p data) (encode-hash-table data cache map-key?))
+    ((pair-p data) (encode-list (list (car data) (cdr data)) cache map-key?))
     ((consp data) (encode-list data cache map-key?))
     ((typep data 'quri:uri) (encode-uri data))
     ((special-numberp data) (encode-special-number data))

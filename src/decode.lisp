@@ -120,7 +120,7 @@ We return a `tr-timestamp' carrying the number of millisecs since epoch
   (if (equal *MAP-AS-CHAR* (car data))
       (let ((hash (make-hash-table :test #'equalp
                                    :size (/ (list-length (cdr data)) 2))))
-        (dolist (pair  (serapeum:batches (cdr data) 2)) ;TODO rid serapeum
+        (dolist (pair (serapeum:batches (cdr data) 2)) ;TODO rid serapeum
           (setf (gethash (decode (car pair) cache t) hash)
                 (decode (cadr pair) cache nil)))
         hash)
