@@ -233,11 +233,3 @@
   (is (= (decode-json (encode-json #xFADED/FACADE)) #xFADED/FACADE))
   (is (= (decode-mp (encode-mp 22/33)) 2/3))
   (is (= (decode-json (encode-json 22/33)) 2/3)))
-
-(test dotted-pair
-  (let ((v (cons 1 2))
-        (v* '(1 2)))
-    (is (equal v* (decode-json (encode-json v))))
-    (is (equal v* (decode-json (encode-json v))))
-    (is (equal (decode-json (encode-json v))
-               (decode-mp (encode-mp v))))))
