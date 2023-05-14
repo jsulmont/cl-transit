@@ -64,19 +64,14 @@
                      :if-exists :supersede)
     (read f)))
 
-(test json<->mp
+(test json-verbose-mp-decode-to-same
   (let ((examples (set-difference *examples* *except-examples* :test #'equalp)))
     (dolist (example examples)
       (let ((f1 (decode-json (example-json example)))
-            (f2 (decode-mp (example-mp example))))
-        (is (tr-equalp f1 f2))))))
-
-(test json<->verbose
-  (let ((examples (set-difference *examples* *except-examples* :test #'equalp)))
-    (dolist (example examples)
-      (let ((f1 (decode-json (example-json example)))
-            (f2 (decode-json (example-verbose example))))
-        (is (tr-equalp f1 f2))))))
+            (f2 (decode-mp (example-mp example)))
+            (f3 (decode-json (example-json example))))
+        (is (tr-equalp f1 f2))
+        (is (tr-equalp f2 f3))))))
 
 (test decode-marshalable
   (dolist (example *marshalable-examples*)
@@ -241,3 +236,11 @@
     (is (equal v* (decode-json (encode-json v))))
     (is (equal (decode-json (encode-json v))
                (decode-mp (encode-mp v))))))
+
+;; verify we encode correctly
+;; TODO
+;; (test check-encoded-against-examplars
+;;   (dolist (example *marshalable-examples*)
+;;     (let ((value (ms:unmarshal (slurp example))))
+;;       (is (equalp (encode-mp value) (example-mp example)))
+;;       (is (string= (encode-json value) (example-json example))))))
