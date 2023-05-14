@@ -212,17 +212,17 @@
     ((typep data 'ratio) (encode-ratio data))
     (t data)))
 
-(defun encode* (data)
+(defun encode* (data &optional (cache nil) (map-key? nil))
   (let ((mpk:*encode-alist-as-map* nil)
-        (result (encode data)))
+        (result (encode data cache map-key?)))
     (if (eq *encode-target* 'JSON)
         (jzon:stringify result)
         (mpk:encode result))))
 
-(defun encode-json (data)
+(defun encode-json (data &optional (cache nil) (map-key? nil))
   (let ((*encode-target* 'JSON))
-    (encode* data)))
+    (encode* data cache map-key?)))
 
-(defun encode-mp (data)
+(defun encode-mp (data &optional (cache nil) (map-key? nil))
   (let ((*encode-target* 'MSGPACK))
-    (encode* data)))
+    (encode* data cache map-key?)))
