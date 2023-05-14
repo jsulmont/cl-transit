@@ -29,10 +29,8 @@
 
 (defun code-to-index (code)
   (if (= 2 (length code))
-
       (- (char-code (aref code 1))
          *base-char-idx*)
-
       (+ (- (char-code (aref code 2)) *base-char-idx*)
          (* (- (char-code (aref code 1)) *base-char-idx*)
             *cache-code-digits*))))
@@ -58,14 +56,12 @@
        (char= (aref str 0) #\^)
        (not (string= str *MAP-AS-CHAR*))))
 
-
 (defmethod cache-read ((this read-cache) str map-key?)
   (if (plusp (length str))
       (with-slots (index cache) this
         (cond
          ((cache-key-p str)
           (aref cache (code-to-index str)))
-
          ((cacheable-p str map-key?)
           (when (= index *max-cache-entries*)
             (setf index 0))

@@ -69,21 +69,30 @@
 (defun encode-hash-table (data cache map-key?)
   (declare (ignore map-key?)
            (hash-table data))
-  (if (eq *encode-target* 'MSGPACK)
-      (let ((rc (make-hash-table
-                 :test #'equalp
-                 :size (hash-table-count data))))
-        (maphash (lambda (k v)
-                   (let ((k% (encode k cache t))
-                         (v% (encode v cache nil)))
-                     (setf (gethash k% rc) v%)))
-                 data)
-        rc)
-      (cons "^ "
+  (if (every #'atom (alex:hash-table-keys data))
+      (if (eq *encode-target* 'MSGPACK)
+          (let ((rc (make-hash-table
+                     :test #'equalp
+                     :size (hash-table-count data))))
+            (maphash (lambda (k v)
+                       (let ((k% (encode k cache t))
+                             (v% (encode v cache nil)))
+                         (setf (gethash k% rc) v%)))
+                     data)
+            rc)
+          (cons "^ "
+                (loop for k being the hash-key in data
+                        using (hash-value v)
+                      collect (encode k cache t)
+                      collect (encode v cache nil))))
+      (list (cache-write cache "~#cmap" nil)
             (loop for k being the hash-key in data
                     using (hash-value v)
-                  collect (encode k cache t)
-                  collect (encode v cache nil)))))
+                  collect (encode k cache)
+                  collect (encode v cache))
+
+            )
+      ))
 
 (defun encode-hash-cons (data cache map-key?)
   (declare (cons data))
@@ -212,17 +221,69 @@
     ((typep data 'ratio) (encode-ratio data))
     (t data)))
 
-(defun encode* (data)
+(defun encode* (data &optional (cache nil) (map-key? nil))
   (let ((mpk:*encode-alist-as-map* nil)
-        (result (encode data)))
+        (result (encode data cache map-key?)))
     (if (eq *encode-target* 'JSON)
         (jzon:stringify result)
         (mpk:encode result))))
 
-(defun encode-json (data)
+(defun encode-json (data &optional (cache nil) (map-key? nil))
   (let ((*encode-target* 'JSON))
-    (encode* data)))
+    (encode* data cache map-key?)))
 
-(defun encode-mp (data)
+(defun encode-mp (data &optional (cache nil) (map-key? nil))
   (let ((*encode-target* 'MSGPACK))
-    (encode* data)))
+    (encode* data cache map-key?)))
+
+;; (defparameter *examples-dir*
+;;   (asdf:system-relative-pathname "cl-transit" "../transit-format/examples/0.8/simple"))
+
+;; (defparameter *fixture-dir*
+;;   (asdf:system-relative-pathname "cl-transit" "tests/fixtures"))
+
+;; (defun example-json (example)
+;;   (let ((fn (format nil "~a/~a.json" *examples-dir* example)))
+;;     (alex:read-file-into-string fn)))
+
+;; (defun example-verbose (example)
+;;   (let ((fn (format nil "~a/~a.verbose.json" *examples-dir* example)))
+;;     (alex:read-file-into-string fn)))
+
+;; (defun example-mp (example)
+;;   (let ((fn (format nil "~a/~a.mp" *examples-dir* example)))
+;;     (alex:read-file-into-byte-vector fn)))
+
+;; (defun fixture (name)
+;;   (format nil "~a/~a.cl" *fixture-dir* name))
+
+;; (defun spit (name value)
+;;   (with-open-file (f name
+;;                      :direction :output
+;;                      :if-exists :supersede
+;;                      :if-does-not-exist :create)
+;;     (write-string value f)))
+
+;; (defun slurp (name)
+;;   (with-open-file (f (fixture name)
+;;                      :direction :input
+;;                      :if-exists :supersede)
+;;     (read f)))
+
+;; (decode-mp (example-mp "cmap_pathological"))
+
+;; (defvar val)
+
+;; (defvar cache)
+
+;; (setf val (ms:unmarshal(slurp "cmap_pathological")))
+
+;; (setf val (ms:unmarshal(slurp "map_vector_keys")))
+
+;; (setf cache (make-instance 'write-cache))
+
+;; (encode-json val )
+
+;; (format t "~a~%" cache)
+
+;; (spit "/tmp/t1.json" (encode-json val cache))
