@@ -39,8 +39,8 @@
       (error "'name must be string")))
   (when (slot-boundp link 'render)
     (let ((render (slot-value link 'render)))
-      (unless (or (equalp render "image")
-                  (equalp render "link"))
+      (unless (or (equal render "image")
+                  (equal render "link"))
         (error "'render must be \"link\" or \"image\""))))
   (when (slot-boundp link 'prompt)
     (unless (typep (slot-value link 'prompt) 'string)
@@ -51,7 +51,7 @@
 
 (defclass tr-set ()
   ((rep
-    :type cons
+    :type sequence
     :initarg :rep
     :accessor rep
     :initform '())))
@@ -69,10 +69,10 @@
 (defmethod tr-timestampp ((this tr-timestamp)) t)
 (defmethod tr-timestampp ((this t)) nil)
 
-(defmethod initialize-instance :after ((this tr-set) &key)
-  (with-slots (rep) this
-    (unless (or (typep rep 'cons)  (null rep))
-      (error "'rep must be cons or ()"))))
+;; (defmethod initialize-instance :after ((this tr-set) &key)
+;;   (with-slots (rep) this
+;;     (unless (or (typep rep 'cons)  (null rep))
+;;       (error "'rep must be cons or ()"))))
 
 (defclass tagged-value ()
   ((tag

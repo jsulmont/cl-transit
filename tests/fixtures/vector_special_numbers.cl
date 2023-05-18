@@ -1,1 +1,1 @@
-(:PCODE 1 (:LIST 1 NAN INF -INF))
+(:PCODE 1 (:ARRAY 1 (3) T (NAN INF -INF)))

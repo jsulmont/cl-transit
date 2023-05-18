@@ -7,7 +7,7 @@
   "we only consider the two mandatory slots"
   (with-slots ((href1 clt::href) (rel1 clt::rel)) l1
     (with-slots ((href2 clt::href) (rel2 clt::rel)) l2
-      (and (equalp href1 href2) (equalp rel1 rel2)))))
+      (and (equal href1 href2) (equal rel1 rel2)))))
 
 (defmethod tr-equalp ((p1 tr-timestamp) (p2 tr-timestamp))
   (with-slots ((m1 cl-transit::m)) p1
@@ -44,7 +44,7 @@
   (with-slots ((tag1 clt::tag) (rep1 clt::rep)) tv1
     (with-slots ((tag2 clt::tag) (rep2 clt::rep)) tv2
       (and (string= tag1 tag2)
-           (equalp rep1 rep2)))))
+           (equal rep1 rep2)))))
 
 (defmethod tr-equalp (x y)
   (equalp x y))
@@ -55,4 +55,12 @@
            (loop
              for x in c1
              for y in c2
+             collect (tr-equalp x y)))))
+
+(defmethod tr-equalp ((c1 vector) (c2 vector))
+  (when (= (length c1) (length c2))
+    (every #'identity
+           (loop
+             for x across c1
+             for y across c2
              collect (tr-equalp x y)))))
