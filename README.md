@@ -6,9 +6,20 @@
 
 The Transit format has been introduced by [Cognitect](https://www.cognitect.com/) and defined [here](https://github.com/cognitect/transit-format).
 
+## About `cl-transit`
+
+* The library decodes  all three official transit format: JSON, JSON-VERBOSE and MESSAGE-PACK.
+  *  JSON-VERBOSE and JSON are decoded indistinctively
+* The library does *not* support encoding to JSON-VERBOSE
+
+### how to use
+
+TODO a few examples
+
 ## Runing tests.
 
 The library is able to process all the tests of the official [test-suite](https://github.com/cognitect/transit-format/blob/master/examples/0.8/simple/README.md). It has been developped and tested with [SBCL](https://www.sbcl.org/) but should work on other CL implementations.  
+
 
 Prerequisites:
 
@@ -42,12 +53,12 @@ To load "cl-transit-tests":
   Load 1 ASDF system:
     cl-transit-tests
 ; Loading "cl-transit-tests"
-............................
+.............................
 
 Running test suite TEST-EXAMPLAR
  Running test JSON-VERBOSE-MP-DECODE-TO-SAME ..................................................................................................................................
- Running test DECODE-MARSHALABLE ................................................................................................................
- Running test ROUND-TRIP-MARSHALABE ................................................................................................................
+ Running test DECODE-MARSHALABLE ........................................................................................................................................................................
+ Running test RND-TRIP-MARSHALABE ................................................................................................................
  Running test ONE-URI .....
  Running test URIS .....
  Running test ONE-UUID .....
@@ -61,15 +72,15 @@ Running test suite TEST-EXAMPLAR
  Running test TRANSIT-LINK ..
  Running test RATIO ....
  Running test DOTTED-PAIR ...
- Did 413 checks.
-    Pass: 413 (100%)
+ Did 469 checks.
+    Pass: 469 (100%)
     Skip: 0 ( 0%)
     Fail: 0 ( 0%)
 ```
 
 ## Default Type Mapping
 
-`clt` is short for `cl-transit` and `lt` short for [local-time](https://github.com/dlowe-net/local-time)
+`clt` is short for `cl-transit` `lt` short for [local-time](https://github.com/dlowe-net/local-time) and see [here](https://github.com/slburson/fset.git) for `fset:set`.
 
 |Transit type|Write accepts|Read returns|
 |------------|-------------|------------|
@@ -87,8 +98,8 @@ Running test suite TEST-EXAMPLAR
 |uuid        |uuid:uuid       |uuid:uuid           |
 |char        |character    |character           |
 |array       |vector       |vector              |
-|list        |list         |list            |
-|set         |fset:set or clt:tr-set         |clt:tr-set          |
+|list        |list         |list             |
+|set         |fset:set   |fset:set         |
 |map         |hash-table   |hash-table       |
 |link        |clt:tr-link        |clt:tr-link|
 |ratio       |ratio        |ratio               |
