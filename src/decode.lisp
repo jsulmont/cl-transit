@@ -11,16 +11,18 @@
   (etypecase rep
     (string
      (uuid:make-uuid-from-string rep))
-    (cons
+    (vector
      (assert (= 2 (length rep)))
      (uuid:byte-array-to-uuid
       (concatenate
        '(array (unsigned-byte 8) (16))
-       (int->octets (car rep))
-       (int->octets (cadr rep)))))))
+       (int->octets (alex:first-elt rep))
+       (int->octets (alex:last-elt rep)))))))
+
+
 
 (defun make-special-number (s)
-  (declare (string s))
+;  (declare (type (simple-array character (*)) s))
   (cond
     ((string= s "NaN") 'NAN)
     ((string= s "INF") 'INF)
@@ -46,14 +48,23 @@
                (parse-integer rep) rep)))
     (make-instance 'tr-timestamp :m m)))
 
-(defun make-tr-set (rep)
-  (make-instance 'tr-set :rep (if (eql rep 'NULL) '() rep)))
-
 (defun try-make-ratio (rep)
-  (declare (list rep))
-  (or #+sbcl (sb-kernel:build-ratio (car rep) (cadr rep))
+  (declare (type (simple-vector 2) rep))
+  (or #+sbcl (sb-kernel:build-ratio (alex:first-elt rep)
+                                    (alex:last-elt rep))
       #-sbcl (make-instance 'tagged-value :tag "ratio" :rep rep)))
 
+;; TODO should we decode the rep? (the python impl doesn't)
+(defun make-cmap-hash (rep)
+  (declare (simple-vector rep))
+  (unless (evenp (length rep))
+    (error "CMAP rep lenght must be even"))
+  (let* ((hash-size (/ (length rep) 2))
+         (hash (make-hash-table :test #'equal :size hash-size)))
+    (loop for i from 0 below hash-size do
+      (setf (gethash (aref rep (* i 2)) hash)
+            (aref rep (1+ (* i 2)))))
+    hash))
 
 #|
 local-time seems bogus: the doc says timestamps are based on 2000-01-01:00:00:00Z
@@ -61,7 +72,6 @@ local-time seems bogus: the doc says timestamps are based on 2000-01-01:00:00:00
 also, it doesn't seem to handle correctly times before epoch;
 We return a `tr-timestamp' carrying the number of millisecs since epoch
 |#
-
 
 (defparameter *decoders*
   (dict "_" (lambda (x) (declare (ignore x)) 'NULL)
@@ -78,9 +88,9 @@ We return a `tr-timestamp' carrying the number of millisecs since epoch
         "n" #'parse-integer
         "z" #'make-special-number
         "link" #'make-tr-link
-        "list" #'identity
-        "set" #'make-tr-set
-        "cmap" (lambda (x) (alex:plist-hash-table x :test 'equalp))
+        "list" (lambda (v) (coerce v 'list))
+        "set" (lambda (v) (fset:convert 'fset:set v))
+        "cmap" #'make-cmap-hash
         "ratio" #'try-make-ratio
         "'" #'identity))
 
@@ -115,34 +125,37 @@ We return a `tr-timestamp' carrying the number of millisecs since epoch
         (funcall decoder rep)
         (make-instance 'tagged-value :tag tag-str :rep rep))))
 
-(defun decode-list (data cache map-key?)
-  (declare (cons data))
-  (if (equal *MAP-AS-CHAR* (car data))
-      (let ((hash (make-hash-table :test #'equalp
-                                   :size (/ (list-length (cdr data)) 2))))
-        (dolist (pair  (serapeum:batches (cdr data) 2)) ;TODO rid serapeum
-          (setf (gethash (decode (car pair) cache t) hash)
-                (decode (cadr pair) cache nil)))
-        hash)
-      (let ((decoded (decode (car data) cache map-key?)))
-        (if (tag-p decoded)
-            (decode-tag (tag-tag decoded)
-                        (decode (cadr data) cache map-key?))
-            (cons decoded
-                  (mapcar (lambda (n) (funcall #'decode n cache map-key?))
-                          (cdr data)))))))
-
-(defun decode-list-or-array (data cache map-key?)
-  (declare (sequence data)) ;; array or non empty list or empty list
-  (when (plusp (length data))
-    (if (typep data 'array)
-        (decode-list (coerce data 'list) cache map-key?)
-        (decode-list data cache map-key?))))
+(defun decode-vector (data cache map-key?)
+  (declare (vector data))
+  (if (plusp (length data))
+      (let ((first (alex:first-elt data)))
+        (if (equal *MAP-AS-CHAR* first)
+            (progn
+              (unless (oddp (length data))
+                (error "*MAP-AS-CHAR* evenp sequence length"))
+              (let* ((rest (subseq data 1))
+                     (hash (make-hash-table :test #'equal
+                                            :size (/ (length rest) 2))))
+                (dolist (pair (serapeum:batches rest 2))
+                  (setf (gethash (decode (alex:first-elt pair) cache t) hash)
+                        (decode (alex:last-elt pair) cache nil)))
+                hash))
+            (let ((decoded (decode first cache map-key?)))
+              (if (tag-p decoded)
+                  (decode-tag (tag-tag decoded)
+                              (decode (alex:last-elt data) cache map-key?))
+                  (progn
+                    (setf (alex:first-elt data) decoded)
+                    (loop for i from 1 below (length data) do
+                      (setf (aref data i)
+                            (decode (aref data i) cache map-key?)))
+                    data)))))
+      data))
 
 (defun decode-hash (data cache map-key?)
   (declare (hash-table data))
   (if (> (hash-table-count data) 1)
-      (let ((hash (make-hash-table :test #'equalp
+      (let ((hash (make-hash-table :test #'equal
                                    :size (hash-table-count data))))
         (loop for k being each hash-key of data
               using (hash-value v)
@@ -159,16 +172,10 @@ We return a `tr-timestamp' carrying the number of millisecs since epoch
   (when (null cache)
     (setf cache (make-instance 'read-cache)))
   (cond
-    ((hash-table-p data)
-     (decode-hash data cache map-key?))
-
-    ((stringp data)
-     (decode-string data cache map-key?))
-
-    ((or (consp data) (arrayp data))
-     (decode-list-or-array data cache map-key?))
-
-    (t data)))
+    ((hash-table-p data) (decode-hash data cache map-key?))
+    ((stringp data) (decode-string data cache map-key?))
+    ((vectorp data) (decode-vector data cache map-key?))
+    (t data)))  ;TODO atom?
 
 (defun decode* (data &optional (cache nil) (map-key? nil))
   (let ((cl:*read-default-float-format* 'long-float))
@@ -183,3 +190,4 @@ We return a `tr-timestamp' carrying the number of millisecs since epoch
 (defun decode-mp (data &optional (cache nil) (map-key? nil))
   (let ((*encode-target* 'MSGPACK))
     (decode* data cache map-key?)))
+

@@ -1,1 +1,1 @@
-(:PCODE 1 (:LIST 1))
+(:PCODE 1 (:ARRAY 1 (0) T NIL))

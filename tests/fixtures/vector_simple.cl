@@ -1,1 +1,1 @@
-(:PCODE 1 (:LIST 1 1 2 3))
+(:PCODE 1 (:ARRAY 1 (3) T (1 2 3)))

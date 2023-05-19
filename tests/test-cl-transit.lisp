@@ -25,13 +25,6 @@
         (uuid:print-bytes s2 u2)
         (string= str1 str2)))))
 
-(defmethod tr-equalp ((s1 tr-set) (s2 tr-set))
-  (unless (slot-boundp s1 'clt::rep)
-    (not (slot-boundp s2 'clt::rep)))
-  (with-slots ((rep1 clt::rep)) s1
-    (with-slots ((rep2 clt::rep)) s2
-      (tr-equalp rep1 rep2))))
-
 (defmethod tr-equalp ((s1 symbol) (s2 symbol))
   (string= s1 s2))
 
@@ -44,7 +37,14 @@
   (with-slots ((tag1 clt::tag) (rep1 clt::rep)) tv1
     (with-slots ((tag2 clt::tag) (rep2 clt::rep)) tv2
       (and (string= tag1 tag2)
-           (equalp rep1 rep2)))))
+           (equal rep1 rep2)))))
+
+
+(defmethod fset:compare ((s1 symbol) (s2 symbol))
+  (fset:compare (string s1) (string s2)))
+
+(defmethod tr-equalp ((s1 fset:set) (s2 fset:set))
+  (fset:equal? s1 s2))
 
 (defmethod tr-equalp (x y)
   (equalp x y))
@@ -55,4 +55,12 @@
            (loop
              for x in c1
              for y in c2
+             collect (tr-equalp x y)))))
+
+(defmethod tr-equalp ((c1 vector) (c2 vector))
+  (when (= (length c1) (length c2))
+    (every #'identity
+           (loop
+             for x across c1
+             for y across c2
              collect (tr-equalp x y)))))

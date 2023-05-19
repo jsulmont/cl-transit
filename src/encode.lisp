@@ -42,7 +42,7 @@
 (defun encode-tr-link (data)
   (declare (tr-link data))
   (if (eq *encode-target* 'MSGPACK)
-      (let ((rc (make-hash-table :test #'equalp)))
+      (let ((rc (make-hash-table :test #'equal)))
         (with-slots (href rel) data
           (setf (gethash "href" rc) (encode-uri href))
           (setf (gethash "rel" rc) rel))
@@ -72,7 +72,7 @@
   (if (every #'atom (alex:hash-table-keys data))
       (if (eq *encode-target* 'MSGPACK)
           (let ((rc (make-hash-table
-                     :test #'equalp
+                     :test #'equal
                      :size (hash-table-count data))))
             (maphash (lambda (k v)
                        (let ((k% (encode k cache t))
@@ -89,10 +89,13 @@
             (loop for k being the hash-key in data
                     using (hash-value v)
                   collect (encode k cache)
-                  collect (encode v cache))
+                  collect (encode v cache)))))
 
-            )
-      ))
+(defun encode-set (data cache map-key?)
+  (declare (fset:set data))
+  (let ((s (fset:convert 'vector data)))
+    (list (cache-write cache "~#set" nil)
+          (encode-vector s cache map-key?))))
 
 (defun encode-hash-cons (data cache map-key?)
   (declare (cons data))
@@ -110,14 +113,20 @@
   (declare (symbol data))
   (cache-write cache (format nil "~~$~a" data) map-key?))
 
-(defun encode-array (data cache map-key?) ;; TODO rewrite?
+(defun encode-vector (data cache map-key?)
   (declare (vector data))
-  (apply #'vector (loop for x across data
-             collect (encode x cache map-key?))))
+  (let ((rc (make-array (length data))))
+    (loop for i from 0 below (length data) do
+      (setf (aref rc i)
+            (encode (aref data i) cache map-key?)))
+    rc))
 
 (defun encode-list (data cache map-key?)
   (declare (cons data))
-  (mapcar (lambda (x) (encode x cache map-key?)) data))
+  (when (car data)
+    (list (cache-write cache "~#list" nil)
+          (mapcar (lambda (x) (encode x cache map-key?))
+                  data))))
 
 (defun special-numberp (data)
   (member data (list 'INF '-INF 'NAN)))
@@ -137,12 +146,6 @@
   (if (eq *encode-target* 'msgpack)
       nil
       (if map-key? "~_" 'NULL)))
-
-(defun encode-tr-set (data cache map-key?)
-  (declare (tr-set data))
-  (list "~#set"
-        (mapcar (lambda (x) (encode x cache map-key?))
-                (slot-value data 'rep))))
 
 (defun encode-tr-timestamp (data)
   (declare (tr-timestamp data))
@@ -204,16 +207,16 @@
     ((eql 'null data) (encode-null data cache map-key?))
     ((eql nil data) (encode-false))
     ((eql T data) T)
-    ((vectorp data) (encode-array data cache map-key?))
+    ((vectorp data) (encode-vector data cache map-key?))
     ((hash-table-p data) (encode-hash-table data cache map-key?))
     ((pair-p data) (encode-list (list (car data) (cdr data)) cache map-key?))
+    ((typep data 'fset:set) (encode-set data cache map-key?))
     ((consp data) (encode-list data cache map-key?))
     ((typep data 'quri:uri) (encode-uri data))
     ((special-numberp data) (encode-special-number data))
     ((keywordp data ) (encode-keyword data cache map-key?))
     ((symbolp data) (encode-symbol data cache map-key?))
     ((tr-linkp data) (encode-tr-link data))
-    ((tr-setp data) (encode-tr-set data cache map-key?))
     ((typep data 'local-time:timestamp) (encode-rfc3339 data))
     ((tr-timestampp data) (encode-tr-timestamp data))
     ((typep data 'uuid:uuid) (encode-uuid data))
@@ -236,54 +239,3 @@
   (let ((*encode-target* 'MSGPACK))
     (encode* data cache map-key?)))
 
-;; (defparameter *examples-dir*
-;;   (asdf:system-relative-pathname "cl-transit" "../transit-format/examples/0.8/simple"))
-
-;; (defparameter *fixture-dir*
-;;   (asdf:system-relative-pathname "cl-transit" "tests/fixtures"))
-
-;; (defun example-json (example)
-;;   (let ((fn (format nil "~a/~a.json" *examples-dir* example)))
-;;     (alex:read-file-into-string fn)))
-
-;; (defun example-verbose (example)
-;;   (let ((fn (format nil "~a/~a.verbose.json" *examples-dir* example)))
-;;     (alex:read-file-into-string fn)))
-
-;; (defun example-mp (example)
-;;   (let ((fn (format nil "~a/~a.mp" *examples-dir* example)))
-;;     (alex:read-file-into-byte-vector fn)))
-
-;; (defun fixture (name)
-;;   (format nil "~a/~a.cl" *fixture-dir* name))
-
-;; (defun spit (name value)
-;;   (with-open-file (f name
-;;                      :direction :output
-;;                      :if-exists :supersede
-;;                      :if-does-not-exist :create)
-;;     (write-string value f)))
-
-;; (defun slurp (name)
-;;   (with-open-file (f (fixture name)
-;;                      :direction :input
-;;                      :if-exists :supersede)
-;;     (read f)))
-
-;; (decode-mp (example-mp "cmap_pathological"))
-
-;; (defvar val)
-
-;; (defvar cache)
-
-;; (setf val (ms:unmarshal(slurp "cmap_pathological")))
-
-;; (setf val (ms:unmarshal(slurp "map_vector_keys")))
-
-;; (setf cache (make-instance 'write-cache))
-
-;; (encode-json val )
-
-;; (format t "~a~%" cache)
-
-;; (spit "/tmp/t1.json" (encode-json val cache))
