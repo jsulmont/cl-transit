@@ -47,17 +47,8 @@
       (error "'prompt must be string"))))
 
 (defmethod tr-linkp ((this tr-link)) t)
+
 (defmethod tr-linkp ((this t)) nil)
-
-(defclass tr-set ()
-  ((rep
-    :type sequence
-    :initarg :rep
-    :accessor rep
-    :initform '())))
-
-(defmethod tr-setp ((this tr-set)) t)
-(defmethod tr-setp ((this t)) nil)
 
 (defclass tr-timestamp ()
   ((m
@@ -67,12 +58,8 @@
     :reader m)))
 
 (defmethod tr-timestampp ((this tr-timestamp)) t)
-(defmethod tr-timestampp ((this t)) nil)
 
-;; (defmethod initialize-instance :after ((this tr-set) &key)
-;;   (with-slots (rep) this
-;;     (unless (or (typep rep 'cons)  (null rep))
-;;       (error "'rep must be cons or ()"))))
+(defmethod tr-timestampp ((this t)) nil)
 
 (defclass tagged-value ()
   ((tag
@@ -85,6 +72,7 @@
     :reader rep)))
 
 (defmethod tagged-valuep ((this tagged-value)) t)
+
 (defmethod tagged-valuep ((this t)) nil)
 
 ;; TODO better print-objects functions
@@ -98,14 +86,13 @@
           (slot-value object 'tag)
           (slot-value object 'rep)))
 
-(defmethod print-object ((object tr-set) stream)
-  (format stream "#<TR-SET ~a>"
-          (slot-value object 'rep)))
-
 (defmethod print-object ((object hash-table) stream)
   (format stream "#HASH{~{~{(~a : ~a)~}~^ ~}}"
           (loop for key being the hash-keys of object
                   using (hash-value value)
                 collect (list key value))))
 
-
+(defmethod print-object ((object tr-link) stream)
+  (with-slots (href rel) object
+    (format stream "<TR-LINK: href=~a rel=~a>~%"
+            href rel)))

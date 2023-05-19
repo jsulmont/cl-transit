@@ -11,24 +11,18 @@
   (etypecase rep
     (string
      (uuid:make-uuid-from-string rep))
-    ;; (cons
-    ;;  (assert (= 2 (length rep)))
-    ;;  (uuid:byte-array-to-uuid
-    ;;   (concatenate
-    ;;    '(array (unsigned-byte 8) (16))
-    ;;    (int->octets (car rep))
-    ;;    (int->octets (cadr rep)))))
     (vector
      (assert (= 2 (length rep)))
      (uuid:byte-array-to-uuid
       (concatenate
        '(array (unsigned-byte 8) (16))
        (int->octets (alex:first-elt rep))
-       (int->octets (alex:last-elt rep)))))
-    ))
+       (int->octets (alex:last-elt rep)))))))
+
+
 
 (defun make-special-number (s)
-  (declare (string s))
+;  (declare (type (simple-array character (*)) s))
   (cond
     ((string= s "NaN") 'NAN)
     ((string= s "INF") 'INF)
@@ -54,17 +48,15 @@
                (parse-integer rep) rep)))
     (make-instance 'tr-timestamp :m m)))
 
-(defun make-tr-set (rep)
-  (make-instance 'tr-set :rep (if (eql rep 'NULL) '() rep)))
-
 (defun try-make-ratio (rep)
-  (declare (list rep))
-  (or #+sbcl (sb-kernel:build-ratio (car rep) (cadr rep))
+  (declare (type (simple-vector 2) rep))
+  (or #+sbcl (sb-kernel:build-ratio (alex:first-elt rep)
+                                    (alex:last-elt rep))
       #-sbcl (make-instance 'tagged-value :tag "ratio" :rep rep)))
 
 ;; TODO should we decode the rep? (the python impl doesn't)
 (defun make-cmap-hash (rep)
-  (declare (vector rep))
+  (declare (simple-vector rep))
   (unless (evenp (length rep))
     (error "CMAP rep lenght must be even"))
   (let* ((hash-size (/ (length rep) 2))
@@ -80,7 +72,6 @@ local-time seems bogus: the doc says timestamps are based on 2000-01-01:00:00:00
 also, it doesn't seem to handle correctly times before epoch;
 We return a `tr-timestamp' carrying the number of millisecs since epoch
 |#
-
 
 (defparameter *decoders*
   (dict "_" (lambda (x) (declare (ignore x)) 'NULL)
@@ -98,7 +89,7 @@ We return a `tr-timestamp' carrying the number of millisecs since epoch
         "z" #'make-special-number
         "link" #'make-tr-link
         "list" (lambda (v) (coerce v 'list))
-        "set" #'make-tr-set
+        "set" (lambda (v) (fset:convert 'fset:set v))
         "cmap" #'make-cmap-hash
         "ratio" #'try-make-ratio
         "'" #'identity))
@@ -182,11 +173,8 @@ We return a `tr-timestamp' carrying the number of millisecs since epoch
     (setf cache (make-instance 'read-cache)))
   (cond
     ((hash-table-p data) (decode-hash data cache map-key?))
-
     ((stringp data) (decode-string data cache map-key?))
-
     ((vectorp data) (decode-vector data cache map-key?))
-
     (t data)))  ;TODO atom?
 
 (defun decode* (data &optional (cache nil) (map-key? nil))
