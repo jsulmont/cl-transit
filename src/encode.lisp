@@ -65,11 +65,15 @@
           (nconc rc (list "render" (slot-value data 'render))))
         (list "~#link" rc))))
 
+(declaim (inline stringifyp))
+(defun stringifyp (data)
+  (or (stringp data) (symbolp data)))
+
 ;; TODO alist/plist
 (defun encode-hash-table (data cache map-key?)
   (declare (ignore map-key?)
            (hash-table data))
-  (if (every #'atom (alex:hash-table-keys data))
+  (if (every #'stringifyp (alex:hash-table-keys data))
       (if (eq *encode-target* 'MSGPACK)
           (let ((rc (make-hash-table
                      :test #'equal
