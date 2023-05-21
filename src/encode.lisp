@@ -23,6 +23,7 @@
         (cache-write cache s map-key?))
       data))
 
+#+trash
 (defun encode-integer (data)
   (declare (integer data))
   (let ((data% (abs data)))
@@ -33,6 +34,16 @@
            (format nil "~~i~a" data)
            data))
       (t (format nil "~~n~a" data)))))
+
+(defun encode-integer (data)
+  (declare (integer data))
+  (cond
+    ((if (eq *encode-target* 'JSON)
+         (and (<= data *json-max-int*) (>= *json-min-int*))
+         (and (<= data *msgpack-max-int*) (>= *msgpack-min-int*)))
+     data)
+    ((typep data 'fixnum) (format nil "~~i~a" data))
+    (t (format nil "~~n~a" data))))
 
 (defun encode-uri (data)
   (declare (quri:uri data))
@@ -65,11 +76,15 @@
           (nconc rc (list "render" (slot-value data 'render))))
         (list "~#link" rc))))
 
+(declaim (inline stringifyp))
+(defun stringifyp (data)
+  (or (stringp data) (symbolp data)))
+
 ;; TODO alist/plist
 (defun encode-hash-table (data cache map-key?)
   (declare (ignore map-key?)
            (hash-table data))
-  (if (every #'atom (alex:hash-table-keys data))
+  (if (every #'stringifyp (alex:hash-table-keys data))
       (if (eq *encode-target* 'MSGPACK)
           (let ((rc (make-hash-table
                      :test #'equal

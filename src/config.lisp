@@ -5,7 +5,7 @@
 (intern "JSON")
 
 (defvar *encode-target* 'JSON
-  "default graound serialization.")
+  "default ground encoding.")
 
 (defvar *encode-alist-as-map* nil
   "alist will be encoded as maps")
@@ -13,7 +13,16 @@
 (defvar *encode-plist-as-map* nil
   "plist will be encoded as maps")
 
-(defvar *encode-json-maxint* 9007199254740992
+(defvar *json-max-int* (1- (expt 2 53))
+  "ground-integer")
+
+(defvar *json-min-int* (- (1- (expt 2 53)))
+  "ground-integer")
+
+(defvar *msgpack-max-int* (1- (expt 2 63))
+  "ground-integer")
+
+(defvar *msgpack-min-int* (- (expt 2 63))
   "ground-integer")
 
 (defun (setf encode-target) (format)
