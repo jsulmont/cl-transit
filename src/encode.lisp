@@ -39,8 +39,8 @@
   (declare (integer data))
   (cond
     ((if (eq *encode-target* 'JSON)
-         (and (<= data *json-max-int*) (>= *json-min-int*))
-         (and (<= data *msgpack-max-int*) (>= *msgpack-min-int*)))
+         (<= *json-min-int* data *json-max-int*)
+         (<= *msgpack-min-int* data *msgpack-max-int*))
      data)
     ((typep data 'fixnum) (format nil "~~i~a" data))
     (t (format nil "~~n~a" data))))
