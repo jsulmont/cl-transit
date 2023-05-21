@@ -23,6 +23,7 @@
         (cache-write cache s map-key?))
       data))
 
+#+trash
 (defun encode-integer (data)
   (declare (integer data))
   (let ((data% (abs data)))
@@ -33,6 +34,16 @@
            (format nil "~~i~a" data)
            data))
       (t (format nil "~~n~a" data)))))
+
+(defun encode-integer (data)
+  (declare (integer data))
+  (cond
+    ((if (eq *encode-target* 'JSON)
+         (and (<= data *json-max-int*) (>= *json-min-int*))
+         (and (<= data *msgpack-max-int*) (>= *msgpack-min-int*)))
+     data)
+    ((typep data 'fixnum) (format nil "~~i~a" data))
+    (t (format nil "~~n~a" data))))
 
 (defun encode-uri (data)
   (declare (quri:uri data))
