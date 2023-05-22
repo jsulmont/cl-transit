@@ -237,18 +237,16 @@
 
 #+sbcl
 (test ratio
-  (is (= (decode-mp (encode-mp #xFADED/FACADE)) #xFADED/FACADE))
-  (is (= (decode-json (encode-json #xFADED/FACADE)) #xFADED/FACADE))
-  (is (= (decode-mp (encode-mp 22/33)) 2/3))
-  (is (= (decode-json (encode-json 22/33)) 2/3)))
+  (is (= (rnd-trip-mp #xFADED/FACADE) #xFADED/FACADE))
+  (is (= (rnd-trip-json #xFADED/FACADE) #xFADED/FACADE))
+  (is (= (rnd-trip-mp  22/33) 2/3))
+  (is (= (rnd-trip-json 22/33) 2/3)))
 
 (test dotted-pair
   (let ((v (cons 1 2))
         (v* '(1 2)))
     (is (equalp v* (rnd-trip-json v)))
-    (is (equalp v* (rnd-trip-json v)))
-    (is (equalp (rnd-trip-json v)
-               (rnd-trip-mp v)))))
+    (is (equalp v* (rnd-trip-mp v)))))
 
 #+nope
 (dolist (example *marshalable-examples*)
