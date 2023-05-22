@@ -76,7 +76,7 @@
     (dolist (example examples)
       (let ((f1 (decode-json-example example))
             (f2 (decode-mp-example example))
-            (f3 (decode-json-example example)))
+            (f3 (decode-verbose-example example)))
         (is (tr-equalp f1 f2))
         (is (tr-equalp f2 f3))))))
 
@@ -114,9 +114,9 @@
     (is (equalp v (rnd-trip-mp v)))))
 
 (test uris
-  (let ((r1 (decode-json (example-json "uris")))
-        (r2 (decode-mp (example-mp "uris")))
-        (r3 (decode-json (example-verbose "uris")))
+  (let ((r1 (decode-json-example "uris"))
+        (r2 (decode-mp-example "uris"))
+        (r3 (decode-verbose-example "uris"))
         (v (coerce (list (quri:uri "http://example.com")
                          (quri:uri "ftp://example.com")
                          (quri:uri "file:///path/to/file.txt")
@@ -129,9 +129,9 @@
     (is (equalp v (rnd-trip-mp v)))))
 
 (test one-uuid
-  (let ((r1 (decode-json (example-json "one_uuid")))
-        (r2 (decode-mp (example-mp "one_uuid")))
-        (r3 (decode-json (example-verbose "one_uuid")))
+  (let ((r1 (decode-json-example "one_uuid"))
+        (r2 (decode-mp-example "one_uuid"))
+        (r3 (decode-verbose-example "one_uuid"))
         (v (uuid:make-uuid-from-string "5A2CBEA3-E8C6-428B-B525-21239370DD55")))
     (is (tr-equalp r1 v))
     (is (tr-equalp r2 v))
@@ -140,9 +140,9 @@
     (is (tr-equalp v (rnd-trip-mp v)))))
 
 (test uuids
-  (let ((r1 (decode-json (example-json "uuids")))
-        (r2 (decode-mp (example-mp "uuids")))
-        (r3 (decode-json (example-verbose "uuids")))
+  (let ((r1 (decode-json-example "uuids"))
+        (r2 (decode-mp-example "uuids"))
+        (r3 (decode-verbose-example "uuids"))
         (v  (coerce (mapcar #'uuid:make-uuid-from-string
                             '("5A2CBEA3-E8C6-428B-B525-21239370DD55"
                               "D1DC64FA-DA79-444B-9FA4-D4412F427289"
@@ -156,9 +156,9 @@
     (is (tr-equalp v (rnd-trip-mp v)))))
 
 (test one-date
-  (let ((r1 (decode-json (example-json "one_date")))
-        (r2 (decode-mp (example-mp "one_date")))
-        (r3 (decode-json (example-verbose "one_date")))
+  (let ((r1 (decode-json-example "one_date"))
+        (r2 (decode-mp-example "one_date"))
+        (r3 (decode-verbose-example "one_date"))
         (ts (make-instance 'tr-timestamp :m 946728000000))
         (lt (local-time:parse-rfc3339-timestring "2000-01-01T12:00:00.000000Z")))
     (is (tr-equalp r1 ts))
@@ -168,9 +168,9 @@
     (is (local-time:timestamp= (rnd-trip-json lt)))))
 
 (test set-empty
-  (let ((r1 (decode-json (example-json "set_empty")))
-        (r2 (decode-mp (example-mp "set_empty")))
-        (r3 (decode-json (example-verbose "set_empty")))
+  (let ((r1 (decode-json-example "set_empty"))
+        (r2 (decode-mp-example "set_empty"))
+        (r3 (decode-verbose-example "set_empty"))
         (v (fset:set)))
     (is (tr-equalp r1 v))
     (is (tr-equalp r2 v))
@@ -179,9 +179,9 @@
     (is (tr-equalp v (rnd-trip-json v)))))
 
 (test set-simple
-  (let ((r1 (decode-json (example-json "set_simple")))
-        (r2 (decode-mp (example-mp "set_simple")))
-        (r3 (decode-json (example-verbose "set_simple")))
+  (let ((r1 (decode-json-example "set_simple"))
+        (r2 (decode-mp-example "set_simple"))
+        (r3 (decode-verbose-example "set_simple"))
         (v (fset:set 1 3 2)))
     (is (tr-equalp r1 v))
     (is (tr-equalp r2 v))
@@ -190,9 +190,9 @@
     (is (tr-equalp v (rnd-trip-json v)))))
 
 (test set-nested
-  (let ((r1 (decode-json (example-json "set_nested")))
-        (r2 (decode-mp (example-mp "set_nested")))
-        (r3 (decode-json (example-verbose "set_nested")))
+  (let ((r1 (decode-json-example "set_nested"))
+        (r2 (decode-mp-example "set_nested"))
+        (r3 (decode-verbose-example "set_nested"))
         (v (fset:set (fset:set 1 2 3)
                      (fset:set nil 0 1 2.0d0 T ':|six| 'NULL
                                ':|seven| "five" "~eight"))))
@@ -203,9 +203,9 @@
     (is (tr-equalp v (rnd-trip-json v)))))
 
 (test set-mixed
-  (let ((r1 (decode-json (example-json "set_mixed")))
-        (r2 (decode-mp (example-mp "set_mixed")))
-        (r3 (decode-json (example-verbose "set_mixed")))
+  (let ((r1 (decode-json-example "set_mixed"))
+        (r2 (decode-mp-example "set_mixed"))
+        (r3 (decode-verbose-example "set_mixed"))
         (v (fset:set nil 0 1 2.0d0 T ':|six| 'NULL
                      ':|seven| "five" "~eight")))
     (is (tr-equalp r1 v))
@@ -215,9 +215,9 @@
     (is (tr-equalp v (rnd-trip-json v)))))
 
 (test maps-unrocognized-keys
-  (let ((r1 (decode-json (example-json "maps_unrecognized_keys")))
-        (r2 (decode-mp (example-mp "maps_unrecognized_keys")))
-        (r3 (decode-json (example-verbose "maps_unrecognized_keys")))
+  (let ((r1 (decode-json-example "maps_unrecognized_keys"))
+        (r2 (decode-mp-example "maps_unrecognized_keys"))
+        (r3 (decode-verbose-example "maps_unrecognized_keys"))
         (v  (make-array 2 :initial-contents
                          (list
                           (make-instance 'tagged-value :tag "abcde" :rep :|anything|)
