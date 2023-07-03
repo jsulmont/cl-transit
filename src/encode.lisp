@@ -138,10 +138,9 @@
 
 (defun encode-list (data cache map-key?)
   (declare (cons data))
-  (when (car data)
-    (list (cache-write cache "~#list" nil)
-          (mapcar (lambda (x) (encode x cache map-key?))
-                  data))))
+  (list (cache-write cache "~#list" nil)
+        (mapcar (lambda (x) (encode x cache map-key?))
+                data)))
 
 (defun special-numberp (data)
   (member data (list 'INF '-INF 'NAN)))
@@ -253,4 +252,3 @@
 (defun encode-mp (data &optional (cache nil) (map-key? nil))
   (let ((*encode-target* 'MSGPACK))
     (encode* data cache map-key?)))
-
