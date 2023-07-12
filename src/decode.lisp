@@ -179,9 +179,10 @@ We return a `tr-timestamp' carrying the number of millisecs since epoch
 
 (defun decode* (data &optional (cache nil) (map-key? nil))
   (let ((cl:*read-default-float-format* 'long-float))
-    (if (eq *encode-target* 'JSON)
-        (decode (jzon:parse data) cache map-key?)
-        (decode (mpk:decode data) cache map-key?))))
+    (if (eq *encode-target* 'MSGPACK)
+        (let ((mpk:*use-null* t))
+          (decode (mpk:decode data) cache map-key?))
+        (decode (jzon:parse data) cache map-key?))))
 
 (defun decode-json (data &optional (cache nil) (map-key? nil))
   (let ((*encode-target* 'JSON))
