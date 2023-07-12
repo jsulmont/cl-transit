@@ -25,13 +25,22 @@ Prerequisites:
 
 * install SBCL (`homebrew`, `apt-get` ...)
 * install [quicklisp](https://www.quicklisp.org/beta/)
-* until [this commit](https://github.com/Zulu-Inuoe/jzon/commit/d6428d6602752d44d5b08e9c0a51d31f92aee2ab)  has made it to quicklisp (monthly), you need manually clone JZON to your local quicklisp directory e.g.,
+* until [this commit](https://github.com/Zulu-Inuoe/jzon/commit/d6428d6602752d44d5b08e9c0a51d31f92aee2ab)  has made it to quicklisp (monthly), you need manually clone `JZON` to your local quicklisp directory e.g.,
 
 ```shell
 $ mkdir -p ~/quicklisp/local-projects
 $ cd ~/quicklisp/local-projects
 $ git clone https://github.com/Zulu-Inuoe/jzon
 ```
+* until [this commit](https://github.com/mbrezu/cl-messagepack/commit/8ff2060ed20677feef8ac01558690df0aeac30b6)  has made it to quicklisp (monthly), you need manually clone `cl-messagepack` to your local quicklisp directory e.g.,
+
+```shell
+$ mkdir -p ~/quicklisp/local-projects
+$ cd ~/quicklisp/local-projects
+$ git clone https://github.com/mbrezu/cl-messagepack
+```
+
+
 then
 
 * clone this repository
@@ -42,7 +51,7 @@ then
 % make test
 sbcl --non-interactive \
 		--load run-tests.lisp
-This is SBCL 2.3.4, an implementation of ANSI Common Lisp.
+This is SBCL 2.3.6.110-c6fdc82a8-WIP, an implementation of ANSI Common Lisp.
 More information about SBCL is available at <http://www.sbcl.org/>.
 
 SBCL is free software, provided as is, with absolutely no warranty.
@@ -71,9 +80,9 @@ Running test suite TEST-EXAMPLAR
  Running test MAPS-UNROCOGNIZED-KEYS .....
  Running test TRANSIT-LINK ..
  Running test RATIO ....
- Running test DOTTED-PAIR ...
- Did 469 checks.
-    Pass: 469 (100%)
+ Running test DOTTED-PAIR ..
+ Did 468 checks.
+    Pass: 468 (100%)
     Skip: 0 ( 0%)
     Fail: 0 ( 0%)
 ```
