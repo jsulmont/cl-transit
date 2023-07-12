@@ -139,8 +139,8 @@
 (defun encode-list (data cache map-key?)
   (declare (cons data))
   (list (cache-write cache "~#list" nil)
-        (mapcar (lambda (x) (encode x cache map-key?))
-                data)))
+        (let ((l (mapcar (lambda (x) (encode x cache map-key?)) data)))
+          (make-array (length l) :initial-contents l))))
 
 (defun special-numberp (data)
   (member data (list 'INF '-INF 'NAN)))
