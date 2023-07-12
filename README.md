@@ -1,12 +1,3 @@
- <!-- PROJECT SHIELDS -->
-
- [![Contributors][contributors-shield]][contributors-url]
- [![Forks][forks-shield]][forks-url]
- [![Stargazers][stars-shield]][stars-url]
- [![Issues][issues-shield]][issues-url]
- [![MS-PL License][license-shield]][license-url]
- [![LinkedIn][linkedin-shield]][linkedin-url]
-
 
 
 # cl-transit: Transit format for Common Lisp
