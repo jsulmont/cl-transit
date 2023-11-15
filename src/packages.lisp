@@ -11,6 +11,7 @@
    -INF INF NAN MSGPACK JSON
    decode-json
    decode-mp
+   decode
    encode-json
    encode-mp
    *encode-target*
@@ -18,6 +19,10 @@
    *encode-alist-as-map*
    *encode-plist-as-map*
    tagged-value
+   tagged-valuep
    tr-timestamp
+   tr-timetampp
    tr-set
-   tr-link))
+   tr-setp
+   tr-link
+   tr-linkp))
