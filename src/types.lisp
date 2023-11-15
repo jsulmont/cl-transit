@@ -86,12 +86,6 @@
           (slot-value object 'tag)
           (slot-value object 'rep)))
 
-(defmethod print-object ((object hash-table) stream)
-  (format stream "#HASH{~{~{(~a : ~a)~}~^ ~}}"
-          (loop for key being the hash-keys of object
-                  using (hash-value value)
-                collect (list key value))))
-
 (defmethod print-object ((object tr-link) stream)
   (with-slots (href rel) object
     (format stream "<TR-LINK: href=~a rel=~a>~%"
