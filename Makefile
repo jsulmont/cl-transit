@@ -1,4 +1,4 @@
-LISP ?= sbcl
+LISP ?= sbcl --non-interactive
 
 all: test
 
@@ -6,11 +6,11 @@ run:
 	rlwrap $(LISP) --load run.lisp
 
 build:
-	$(LISP)	--non-interactive \
-		--load cl-transit.asd \
-		--eval '(ql:quickload :cl-transit)' \
-		--eval '(asdf:make :cl-transit)'
+	$(LISP)	\
+		--load transit.asd \
+		--eval '(ql:quickload :transit)' \
+		--eval '(asdf:make :transit)'
 
 test:
-	$(LISP) --non-interactive \
+	$(LISP) \
 		--load run-tests.lisp

@@ -13,11 +13,11 @@ If you don't want to land in the REPL, you can (quit) below or call lisp with th
 Another solution to run the app is to build and run a binary (see README).
 "
 
-(load "cl-transit.asd")
+(load "transit.asd")
 
-(ql:quickload "cl-transit")
+(ql:quickload "transit")
 
-(in-package :cl-transit)
+(in-package :transit)
 (handler-case
     (main)
   (error (c)

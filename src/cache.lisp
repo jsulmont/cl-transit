@@ -1,4 +1,4 @@
-(in-package :cl-transit)
+(in-package :transit)
 
 (defparameter *base-char-idx* 48)
 (defparameter *cache-code-digits* 44)
@@ -37,14 +37,14 @@
             *cache-code-digits*))))
 
 (defun index-to-code (index)
-   (multiple-value-bind (hi lo)
-       (floor index *cache-code-digits*)
-     (if (zerop hi)
-         (format nil "^~a"
-                 (code-char (+ lo *base-char-idx*)))
-         (format nil "^~a~a"
-                 (code-char (+ hi *base-char-idx*))
-                 (code-char (+ lo *base-char-idx*))))))
+  (multiple-value-bind (hi lo)
+      (floor index *cache-code-digits*)
+    (if (zerop hi)
+        (format nil "^~a"
+                (code-char (+ lo *base-char-idx*)))
+        (format nil "^~a~a"
+                (code-char (+ hi *base-char-idx*))
+                (code-char (+ lo *base-char-idx*))))))
 
 (defun cacheable-p (str map-key?)
   (and (>= (length str) *min-size-cacheable*)
@@ -61,15 +61,15 @@
   (if (plusp (length str))
       (with-slots (index cache) this
         (cond
-         ((cache-key-p str)
-          (aref cache (code-to-index str)))
-         ((cacheable-p str map-key?)
-          (when (= index *max-cache-entries*)
-            (setf index 0))
-          (setf (aref cache index) str)
-          (setf index (1+ index))
-          str)
-         (t str)))
+          ((cache-key-p str)
+           (aref cache (code-to-index str)))
+          ((cacheable-p str map-key?)
+           (when (= index *max-cache-entries*)
+             (setf index 0))
+           (setf (aref cache index) str)
+           (setf index (1+ index))
+           str)
+          (t str)))
       str))
 
 (defmethod cache-write ((this write-cache) str map-key?)

@@ -1,8 +1,8 @@
 (in-package :asdf-user)
 
-(defpackage :cl-transit-tests
+(defpackage :transit-tests
   (:use :cl :fiveam
-        :cl-transit)
+        :transit)
   (:local-nicknames
    (#:jzon #:com.inuoe.jzon)
    (#:alex #:alexandria))

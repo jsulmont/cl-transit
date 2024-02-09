@@ -1,12 +1,12 @@
-(in-package :cl-transit)
+(in-package :transit)
 
 (defun alistp (l)
-   "Alist predicate"
-   (and (consp l) (consp (car l)) (atom (caar l))))
+  "Alist predicate"
+  (and (consp l) (consp (car l)) (atom (caar l))))
 
- (defun plistp (l)
-   "Plist predicate."
-   (and (consp l) (keywordp (car l)) (consp (cdr l))))
+(defun plistp (l)
+  "Plist predicate."
+  (and (consp l) (keywordp (car l)) (consp (cdr l))))
 
 (defun is-byte-array (data-type)
   (and (vectorp data-type)
@@ -172,20 +172,20 @@
   "Interprets `N-BYTES` of a given `ARRAY` as an unsigned integer."
   (let ((int 0))
     (loop
-       for byte-position from 0 below (* 8 n-bytes) by 8
-       for array-position from 0 below n-bytes
-       do (setf (ldb (byte 8 byte-position) int)
-                (aref array (+ start array-position))))
+      for byte-position from 0 below (* 8 n-bytes) by 8
+      for array-position from 0 below n-bytes
+      do (setf (ldb (byte 8 byte-position) int)
+               (aref array (+ start array-position))))
     int))
 
 (defun encode-uuid (data)
-  (declare (uuid:uuid data))
+  (declare (fuuid:uuid data))
   (if (eq *encode-target* 'MSGPACK)
-      (let* ((rep (reverse (uuid:uuid-to-byte-array data)))
-            (lo64 (octets->uint rep 8))
-            (hi64 (octets->uint rep 8 8)))
+      (let* ((rep (reverse (fuuid:to-octets data)))
+             (lo64 (octets->uint rep 8))
+             (hi64 (octets->uint rep 8 8)))
         (list "~#u" (list hi64 lo64)))
-      (format nil "~~u~a" data)))
+      (format nil "~~u~a" (fuuid:to-string data))))
 
 (defun encode-tagged-value (data cache map-key?)
   (declare (tagged-value data))
@@ -203,8 +203,8 @@
 (defun encode-ratio (data)
   (declare (type ratio data))
   (list "~#ratio"
-           (list (encode (numerator data))
-                 (encode (denominator data)))))
+        (list (encode (numerator data))
+              (encode (denominator data)))))
 
 (declaim (inline pair-p))
 (defun pair-p (data)
@@ -233,7 +233,7 @@
     ((tr-linkp data) (encode-tr-link data))
     ((typep data 'local-time:timestamp) (encode-rfc3339 data))
     ((tr-timestampp data) (encode-tr-timestamp data))
-    ((typep data 'uuid:uuid) (encode-uuid data))
+    ((typep data 'fuuid:uuid) (encode-uuid data))
     ((tagged-valuep data) (encode-tagged-value data cache map-key?))
     ((typep data 'ratio) (encode-ratio data))
     (t data)))

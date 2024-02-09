@@ -1,4 +1,4 @@
-(in-package :cl-transit-tests)
+(in-package :transit-tests)
 
 (def-suite test-examplar
   :description "test suite 1")
@@ -6,12 +6,12 @@
 (in-suite test-examplar)
 
 #| Uses test data from https://github.com/cognitect/transit-format
-   which should be cloned at the same level as this repository. |#
+which should be cloned at the same level as this repository. |#
 (defparameter *examples-dir*
-  (asdf:system-relative-pathname "cl-transit" "../transit-format/examples/0.8/simple"))
+  (asdf:system-relative-pathname "transit" "../transit-format/examples/0.8/simple"))
 
 (defparameter *fixture-dir*
-  (asdf:system-relative-pathname "cl-transit" "tests/fixtures"))
+  (asdf:system-relative-pathname "transit" "tests/fixtures"))
 
 ;; all defined tests
 (defparameter *examples*
@@ -132,7 +132,7 @@
   (let ((r1 (decode-json-example "one_uuid"))
         (r2 (decode-mp-example "one_uuid"))
         (r3 (decode-verbose-example "one_uuid"))
-        (v (uuid:make-uuid-from-string "5A2CBEA3-E8C6-428B-B525-21239370DD55")))
+        (v (fuuid:from-string "5A2CBEA3-E8C6-428B-B525-21239370DD55")))
     (is (tr-equalp r1 v))
     (is (tr-equalp r2 v))
     (is (tr-equalp r3 v))
@@ -143,7 +143,7 @@
   (let ((r1 (decode-json-example "uuids"))
         (r2 (decode-mp-example "uuids"))
         (r3 (decode-verbose-example "uuids"))
-        (v  (coerce (mapcar #'uuid:make-uuid-from-string
+        (v  (coerce (mapcar #'fuuid:from-string
                             '("5A2CBEA3-E8C6-428B-B525-21239370DD55"
                               "D1DC64FA-DA79-444B-9FA4-D4412F427289"
                               "501A978E-3A3E-4060-B3BE-1CF2BD4B1A38"
@@ -219,9 +219,9 @@
         (r2 (decode-mp-example "maps_unrecognized_keys"))
         (r3 (decode-verbose-example "maps_unrecognized_keys"))
         (v  (make-array 2 :initial-contents
-                         (list
-                          (make-instance 'tagged-value :tag "abcde" :rep :|anything|)
-                          (make-instance 'tagged-value :tag "fghij" :rep :|anything-else|)))))
+                        (list
+                         (make-instance 'tagged-value :tag "abcde" :rep :|anything|)
+                         (make-instance 'tagged-value :tag "fghij" :rep :|anything-else|)))))
     (is (tr-equalp r1 v))
     (is (tr-equalp r2 v))
     (is (tr-equalp r3 v))

@@ -1,6 +1,6 @@
-(in-package :cl-transit)
+(in-package :transit)
 
-;(setq *block-compile-default* t)
+;;(setq *block-compile-default* t)
 
 (declaim (optimize (speed 3) (debug 0) (safety 0)))
 
@@ -10,10 +10,10 @@
 (defun make-uuid (rep)
   (etypecase rep
     (string
-     (uuid:make-uuid-from-string rep))
+     (fuuid:from-string rep))
     (vector
      (assert (= 2 (length rep)))
-     (uuid:byte-array-to-uuid
+     (fuuid:from-octets
       (concatenate
        '(array (unsigned-byte 8) (16))
        (int->octets (alex:first-elt rep))
@@ -22,7 +22,7 @@
 
 
 (defun make-special-number (s)
-;  (declare (type (simple-array character (*)) s))
+  ;; (declare (type (simple-array character (*)) s))
   (cond
     ((string= s "NaN") 'NAN)
     ((string= s "INF") 'INF)
@@ -99,7 +99,7 @@ We return a `tr-timestamp' carrying the number of millisecs since epoch
   (make-instance 'tagged-value :tag tag :rep rep))
 
 (defun parse-string (s)
-  ;(declare ((simple-array character(*)) s))
+  ;;(declare ((simple-array character(*)) s))
   (declare (string s))
   (if (and (> (length s) 0)
            (string= (subseq s 0 1) *ESC*))
@@ -158,7 +158,7 @@ We return a `tr-timestamp' carrying the number of millisecs since epoch
       (let ((hash (make-hash-table :test #'equal
                                    :size (hash-table-count data))))
         (loop for k being each hash-key of data
-              using (hash-value v)
+                using (hash-value v)
               do (setf (gethash (decode k cache t) hash)
                        (decode v cache nil)))
         hash)

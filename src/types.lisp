@@ -1,4 +1,4 @@
-(in-package :cl-transit)
+(in-package :transit)
 
 (intern "-INF")
 (intern "INF")

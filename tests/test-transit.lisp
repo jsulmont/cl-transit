@@ -1,4 +1,4 @@
-(in-package :cl-transit-tests)
+(in-package :transit-tests)
 
 (defgeneric tr-equalp (o1 o2)
   (:documentation "test two transit values for equality"))
@@ -10,20 +10,12 @@
       (and (equalp href1 href2) (equalp rel1 rel2)))))
 
 (defmethod tr-equalp ((p1 tr-timestamp) (p2 tr-timestamp))
-  (with-slots ((m1 cl-transit::m)) p1
-    (with-slots ((m2 cl-transit::m)) p2
+  (with-slots ((m1 transit::m)) p1
+    (with-slots ((m2 transit::m)) p2
       (= m1 m2))))
 
-(defmethod tr-equalp ((u1 uuid:uuid) (u2 uuid:uuid))
-  (let ((str1 (make-array '(0) :element-type 'base-char
-                             :fill-pointer 0 :adjustable t))
-        (str2 (make-array '(0) :element-type 'base-char
-                             :fill-pointer 0 :adjustable t)))
-    (with-output-to-string (s1 str1)
-      (uuid:print-bytes s1 u1)
-      (with-output-to-string (s2 str2)
-        (uuid:print-bytes s2 u2)
-        (string= str1 str2)))))
+(defmethod tr-equalp ((u1 fuuid:uuid) (u2 fuuid:uuid))
+  (fuuid:uuid= u1 u2))
 
 (defmethod tr-equalp ((s1 symbol) (s2 symbol))
   (string= s1 s2))
