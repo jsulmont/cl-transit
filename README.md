@@ -1,5 +1,3 @@
-
-
 # cl-transit: Transit format for Common Lisp
 
 *À tout Seigneur tout Honneur !*
@@ -65,6 +63,7 @@ To load "cl-transit-tests":
     cl-transit-tests
 ; Loading "cl-transit-tests"
 .............................
+
 
 Running test suite TEST-EXAMPLAR
  Running test JSON-VERBOSE-MP-DECODE-TO-SAME ..................................................................................................................................
