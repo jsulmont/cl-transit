@@ -22,8 +22,8 @@
 
 (defmethod tr-equalp ((ht1 hash-table) (ht2 hash-table))
   (tr-equalp
-   (alexandria:hash-table-keys ht1)
-   (alexandria:hash-table-keys ht2)))
+   (alexandria:hash-table-alist ht1)
+   (alexandria:hash-table-alist ht2)))
 
 (defmethod tr-equalp ((tv1 tagged-value) (tv2 tagged-value))
   (with-slots ((tag1 clt::tag) (rep1 clt::rep)) tv1
