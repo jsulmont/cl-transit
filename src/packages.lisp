@@ -2,7 +2,7 @@
   (:use :cl)
   (:import-from :bit-smasher :int->octets)
   (:import-from :parse-float :parse-float)
-  (:import-from :serapeum :dict)
+  (:import-from :serapeum :dict :vect)
   (:nicknames #:clt)
   (:local-nicknames
    (#:jzon #:com.inuoe.jzon)

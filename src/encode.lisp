@@ -23,18 +23,6 @@
         (cache-write cache s map-key?))
       data))
 
-#+trash
-(defun encode-integer (data)
-  (declare (integer data))
-  (let ((data% (abs data)))
-    (cond
-      ((< data% *encode-json-maxint*) data)
-      ((typep data 'fixnum)
-       (if (eq *encode-target* 'JSON)
-           (format nil "~~i~a" data)
-           data))
-      (t (format nil "~~n~a" data)))))
-
 (defun encode-integer (data)
   (declare (integer data))
   (cond
@@ -50,7 +38,7 @@
   (format nil "~~r~a" data))
 
 ;; TODO idiomatic?
-(defun encode-tr-link (data)
+(defun encode-tr-link (data cache map-key?)
   (declare (tr-link data))
   (if (eq *encode-target* 'MSGPACK)
       (let ((rc (make-hash-table :test #'equal)))
@@ -63,7 +51,7 @@
           (setf (gethash "prompt" rc) (slot-value data 'prompt)))
         (when (slot-boundp data 'render)
           (setf (gethash "render" rc) (slot-value data 'render)))
-        (list "~#link" rc))
+        (list (write-cache cache "~#link" map-key?) rc))
       (let ((rc '("^ ")))
         (with-slots (href rel) data
           (setf rc (nconc rc (list "href" (encode-uri href))))
@@ -74,7 +62,7 @@
           (nconc rc (list "prompt" (slot-value data 'prompt))))
         (when (slot-boundp data 'render)
           (nconc rc (list "render" (slot-value data 'render))))
-        (list "~#link" rc))))
+        (list (write-cache cache "~#link" map-key?) rc))))
 
 (declaim (inline stringifyp))
 (defun stringifyp (data)
@@ -190,7 +178,7 @@
 (defun encode-tagged-value (data cache map-key?)
   (declare (tagged-value data))
   (with-slots (tag rep) data
-    (list (format nil "~~#~a" tag)
+    (list (cache-write cache (format nil "~~#~a" tag) map-key?)
           (encode rep cache map-key?))))
 
 (declaim (inline encode-false))
@@ -200,9 +188,9 @@
       nil))
 
 (declaim (inline encode-ratio))
-(defun encode-ratio (data)
+(defun encode-ratio (data cache map-key?)
   (declare (type ratio data))
-  (list "~#ratio"
+  (list (cache-write cache "~#ratio" map-key?)
         (list (encode (numerator data))
               (encode (denominator data)))))
 
@@ -235,7 +223,7 @@
     ((tr-timestampp data) (encode-tr-timestamp data))
     ((typep data 'fuuid:uuid) (encode-uuid data))
     ((tagged-valuep data) (encode-tagged-value data cache map-key?))
-    ((typep data 'ratio) (encode-ratio data))
+    ((typep data 'ratio) (encode-ratio data cache map-key?))
     (t data)))
 
 (defun encode* (data &optional (cache nil) (map-key? nil))
@@ -252,3 +240,4 @@
 (defun encode-mp (data &optional (cache nil) (map-key? nil))
   (let ((*encode-target* 'MSGPACK))
     (encode* data cache map-key?)))
+
