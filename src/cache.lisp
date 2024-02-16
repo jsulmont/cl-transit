@@ -16,7 +16,6 @@
 
 (defmethod print-object ((this write-cache) stream)
   (with-slots (index cache) this
-    (error "BINGO")
     (format t "<WC index=~a cache=~a>" index cache)))
 
 (defclass read-cache ()
