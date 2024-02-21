@@ -120,7 +120,7 @@ Happy to take contributions, and any kind of improvments (performance, coding st
 
 ## Copyright and License
 
-Copyright © 2024 Jan Sulmont
+Copyright © 2023, 2024 Jan Sulmont
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
