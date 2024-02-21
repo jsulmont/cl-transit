@@ -218,7 +218,7 @@
     ((special-numberp data) (encode-special-number data))
     ((keywordp data ) (encode-keyword data cache map-key?))
     ((symbolp data) (encode-symbol data cache map-key?))
-    ((tr-linkp data) (encode-tr-link data))
+    ((tr-linkp data) (encode-tr-link data cache map-key?))
     ((typep data 'local-time:timestamp) (encode-rfc3339 data))
     ((tr-timestampp data) (encode-tr-timestamp data))
     ((typep data 'fuuid:uuid) (encode-uuid data))

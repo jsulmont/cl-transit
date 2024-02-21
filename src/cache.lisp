@@ -16,7 +16,7 @@
 
 (defmethod print-object ((this write-cache) stream)
   (with-slots (index cache) this
-    (format t "<WC index=~a cache=~a>" index cache)))
+    (format stream "<WC index=~a cache=~a>" index cache)))
 
 (defclass read-cache ()
   ((index
@@ -72,6 +72,7 @@
       str))
 
 (defmethod cache-write ((this write-cache) str map-key?)
+  ;; (format t "(cache-write ~a ~a)~%" str map-key?)
   (if (plusp (length str))
       (with-slots (index cache) this
         (let ((code (gethash str cache)))
@@ -82,6 +83,7 @@
                (clrhash cache)
                (setf index 0))
              (setf (gethash str cache) (index-to-code index))
+             ;;(format t "++ add ~a to cache at index ~a ~%" str index)
              (setf index (1+ index))
              str)
             (t str))))
